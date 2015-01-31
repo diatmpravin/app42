@@ -1,1 +1,94 @@
 package configuration
+
+import (
+	"encoding/json"
+	"fmt"
+	term "github.com/diatmpravin/cli/app42/terminal"
+	"io/ioutil"
+	"os"
+	"os/user"
+)
+
+const (
+	filePermissions = 0644
+	dirPermissions  = 0700
+)
+
+type Keys struct {
+	ApiKey     string
+	SecretKey  string
+	ApiVersion string
+}
+
+func (k Keys) Save() (err error) {
+	bytes, err := json.Marshal(k)
+
+	if err != nil {
+		return
+	}
+
+	file, err := configFile()
+
+	if err != nil {
+		return
+	}
+
+	err = ioutil.WriteFile(file, bytes, filePermissions)
+
+	return
+}
+
+func configFile() (file string, err error) {
+	currentUser, err := user.Current()
+
+	if err != nil {
+		return
+	}
+
+	configDir := currentUser.HomeDir + "/.app42"
+
+	err = os.MkdirAll(configDir, dirPermissions)
+
+	if err != nil {
+		return
+	}
+
+	file = configDir + "/app42paas.yml"
+
+	return
+}
+
+func Load() (k Keys, err error) {
+	file, err := configFile()
+
+	if err != nil {
+		return
+	}
+
+	data, err := ioutil.ReadFile(file)
+
+	if err != nil {
+		fmt.Println("API key and Secret key not found")
+		return
+	}
+
+	err = json.Unmarshal(data, &k)
+
+	return
+}
+
+func ShowKeys() {
+	config, err := Load()
+
+	if err != nil {
+		fmt.Println("File is invalid", err)
+	}
+
+	showConfiguration(config)
+}
+
+func showConfiguration(k Keys) {
+	term.Say("=== API/Secret Key ===")
+	term.Say("API Key:    %s ", k.ApiKey)
+	term.Say("Secret Key: %s ", k.SecretKey)
+}

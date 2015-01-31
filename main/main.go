@@ -23,6 +23,15 @@ func main() {
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:      "addKeys",
+			ShortName: "ak",
+			Usage:     "Add API key and Secret key",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewKeys()
+				cmd.Run(c)
+			},
+		},
 	}
 
 	app.Run(os.Args)
