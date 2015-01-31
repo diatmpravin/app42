@@ -20,6 +20,17 @@ type Keys struct {
 	ApiVersion string
 }
 
+func DeleteKeys() (err error) {
+	file, err := configFile()
+
+	if err != nil {
+		return
+	}
+
+	os.Remove(file)
+	return
+}
+
 func (k Keys) Save() (err error) {
 	bytes, err := json.Marshal(k)
 

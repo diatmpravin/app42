@@ -32,6 +32,23 @@ func main() {
 				cmd.Run(c)
 			},
 		},
+		{
+			Name:      "keys",
+			ShortName: "k",
+			Usage:     "List API key and Secret key",
+			Action: func(c *cli.Context) {
+				commands.Keys(c)
+			},
+		},
+		{
+			Name:      "clearKeys",
+			ShortName: "ck",
+			Usage:     "Clear API key and Secret key",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewClearKeys()
+				cmd.Run(c)
+			},
+		},
 	}
 
 	app.Run(os.Args)
