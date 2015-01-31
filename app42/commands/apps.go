@@ -1,9 +1,10 @@
-package main
+package commands
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/diatmpravin/cli_sample/util"
+	"github.com/codegangsta/cli"
+	"github.com/diatmpravin/cli/app42/util"
 	"net/http"
 )
 
@@ -14,13 +15,21 @@ const (
 	host      = "https://paashq.shephertz.com/paas/1.0/app"
 )
 
+type Apps struct {
+	Name string
+}
+
 type Param struct {
 	ApiKey    string `json:"apiKey"`
 	Version   string `json:"version"`
 	TimeStamp string `json:"timeStamp"`
 }
 
-func main() {
+func NewApps() (a Apps) {
+	return
+}
+
+func (a Apps) Run(c *cli.Context) {
 	time := util.TimeStamp()
 	fmt.Println(time)
 
