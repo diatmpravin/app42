@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"github.com/diatmpravin/cli/app42/util"
+	term "github.com/diatmpravin/app42_client/app42/terminal"
+	"github.com/diatmpravin/app42_client/app42/util"
 	"net/http"
 )
 
@@ -41,7 +42,8 @@ func (a Apps) Run(c *cli.Context) {
 	params, err := json.Marshal(p)
 
 	if err != nil {
-		fmt.Println("Json Encoding Error:", err)
+		term.Failed("Json Encoding Error:", err)
+		return
 	}
 
 	signature := util.Sign(secretKey, string(params))
@@ -67,7 +69,5 @@ func (a Apps) Run(c *cli.Context) {
 	rawResponse, err := cli.Do(request)
 	fmt.Println("rawResponse====>", rawResponse)
 	fmt.Println(err)
-
-	//return &AuthorizedRequest{request}, err
 
 }

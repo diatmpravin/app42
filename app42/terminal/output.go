@@ -14,3 +14,20 @@ func Say(message string, args ...interface{}) {
 	fmt.Printf(message+"\n", args...)
 	return
 }
+
+func Failed(message string, err error) {
+	Say(Red("FAILED"))
+
+	if message != "" {
+		Say(message)
+	}
+
+	if err != nil {
+		Say(err.Error())
+	}
+	return
+}
+
+func Ok() {
+	Say(Green("OK"))
+}

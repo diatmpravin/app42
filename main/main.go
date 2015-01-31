@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/diatmpravin/cli/app42/commands"
+	"github.com/diatmpravin/app42_client/app42/commands"
 	"os"
 )
 

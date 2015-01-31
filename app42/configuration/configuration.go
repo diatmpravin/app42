@@ -2,8 +2,7 @@ package configuration
 
 import (
 	"encoding/json"
-	"fmt"
-	term "github.com/diatmpravin/cli/app42/terminal"
+	term "github.com/diatmpravin/app42_client/app42/terminal"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -79,7 +78,7 @@ func Load() (k Keys, err error) {
 	data, err := ioutil.ReadFile(file)
 
 	if err != nil {
-		fmt.Println("API key and Secret key not found")
+		term.Failed("API key and Secret key not found", err)
 		return
 	}
 
@@ -92,14 +91,16 @@ func ShowKeys() {
 	config, err := Load()
 
 	if err != nil {
-		fmt.Println("File is invalid", err)
+		term.Failed("File is invalid", err)
+		return
+
 	}
 
 	showConfiguration(config)
 }
 
 func showConfiguration(k Keys) {
-	term.Say("=== API/Secret Key ===")
+	term.Say(term.Yellow("=== API/Secret Key ==="))
 	term.Say("API Key:    %s ", k.ApiKey)
 	term.Say("Secret Key: %s ", k.SecretKey)
 }
