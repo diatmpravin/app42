@@ -1,19 +1,12 @@
 package commands
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/codegangsta/cli"
-	term "github.com/diatmpravin/app42_client/app42/terminal"
-	"github.com/diatmpravin/app42_client/app42/util"
+	"github.com/diatmpravin/app42_client/app42/api"
+	"github.com/diatmpravin/app42_client/app42/base"
+	"github.com/diatmpravin/app42_client/app42/constant"
 	"net/http"
-)
-
-const (
-	version   = "1.0"
-	apiKey    = "ea71af1b0d732835af33e7bb1a7b7984ee705169c7c395b79ad4d6a06cd8f246"
-	secretKey = "57aeabbba4864e3c5b39f2b2f39c27d1dcfa4a0fef9e8c17bcc67bd0ee815d29"
-	host      = "https://paashq.shephertz.com/paas/1.0/app"
 )
 
 type Apps struct {
@@ -31,43 +24,18 @@ func NewApps() (a Apps) {
 }
 
 func (a Apps) Run(c *cli.Context) {
-	time := util.TimeStamp()
-	fmt.Println(time)
 
-	p := &Param{
-		ApiKey:    apiKey,
-		Version:   version,
-		TimeStamp: time}
+	path := constant.Host + constant.Version + "/app"
 
-	params, err := json.Marshal(p)
+	apps := a.findAllApps(path)
+	fmt.Println("Response====>", apps)
 
-	if err != nil {
-		term.Failed("Json Encoding Error:", err)
-		return
-	}
+}
 
-	signature := util.Sign(secretKey, string(params))
+func (a Apps) findAllApps(url string) (response *http.Response) {
 
-	fmt.Println("Final Signature==>", signature)
-	fmt.Println("Params ==========>", string(params))
+	secretKey, params := base.Params()
+	response = api.NewGetRequest("GET", url, secretKey, string(params))
 
-	request, err := http.NewRequest("GET", host, nil)
-
-	request.Header.Set("Accept", "application/json")
-	request.Header.Set("Content-Type", "application/json")
-	request.Header.Set("params", string(params))
-	request.Header.Set("apiKey", apiKey)
-	request.Header.Set("version", version)
-	request.Header.Set("timeStamp", time)
-	request.Header.Set("signature", signature)
-
-	fmt.Println(request)
-	fmt.Println(err)
-
-	cli := &http.Client{}
-
-	rawResponse, err := cli.Do(request)
-	fmt.Println("rawResponse====>", rawResponse)
-	fmt.Println(err)
-
+	return
 }

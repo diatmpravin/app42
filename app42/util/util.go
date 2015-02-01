@@ -6,31 +6,12 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"net/url"
-	"strings"
-	"time"
 )
 
 type Param struct {
 	ApiKey    string `json:"apiKey"`
 	Version   string `json:"version"`
 	TimeStamp string `json:"timeStamp"`
-}
-
-func TimeStamp() string {
-	currentTime := time.Now().UTC()
-
-	formatedTime := currentTime.Format(time.RFC3339)
-
-	dateTime := strings.Split(formatedTime, "T")
-
-	stampMilli := currentTime.Format(time.StampMilli)
-
-	timeArray := strings.Split(stampMilli, " ")
-
-	s := []string{dateTime[0], timeArray[2]}
-	final := strings.Join(s, "T")
-
-	return final + "Z"
 }
 
 func Sign(secretKey, params string) string {
