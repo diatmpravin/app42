@@ -5,16 +5,11 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"net/url"
-	"reflect"
+	"sort"
 )
 
-type Param struct {
-	ApiKey    string `json:"apiKey"`
-	Version   string `json:"version"`
-	TimeStamp string `json:"timeStamp"`
-}
+var p map[string]string
 
 func Sign(secretKey, params string) string {
 	sortedParams := sortConvert(params)
@@ -25,13 +20,19 @@ func Sign(secretKey, params string) string {
 func sortConvert(params string) string {
 	var sortedParams string
 
-	var pro Param
+	p = make(map[string]string)
 
-	_ = json.Unmarshal([]byte(params), &pro)
+	_ = json.Unmarshal([]byte(params), &p)
 
-	fmt.Println("pro==============>", reflect.TypeOf(pro))
+	var keys []string
+	for k := range p {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
 
-	sortedParams = sortedParams + "apiKey" + pro.ApiKey + "timeStamp" + pro.TimeStamp + "version" + pro.Version
+	for _, k := range keys {
+		sortedParams = sortedParams + k + p[k]
+	}
 
 	return sortedParams
 }

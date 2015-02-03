@@ -27,11 +27,7 @@ func NewGetRequest(method, path string) (request *http.Request) {
 func PerformRequestForBody(request *http.Request, response interface{}) (interface{}, error) {
 	cli := &http.Client{}
 
-	fmt.Println("AAAAAAAAAAAAAAAAAA", request)
-
 	rawResponse, err := cli.Do(request)
-
-	fmt.Println(rawResponse)
 
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Error performing request: %s", err.Error()))

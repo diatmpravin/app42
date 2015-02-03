@@ -10,11 +10,7 @@ import (
 	"time"
 )
 
-type BasicParams struct {
-	ApiKey    string `json:"apiKey"`
-	Version   string `json:"version"`
-	TimeStamp string `json:"timeStamp"`
-}
+var basicParams map[string]string
 
 func Params() (secretKey string, params []byte) {
 
@@ -26,13 +22,13 @@ func Params() (secretKey string, params []byte) {
 
 	}
 
-	p := &BasicParams{
-		ApiKey:    config.ApiKey,
-		Version:   constant.Version,
-		TimeStamp: TimeStampUTC(),
-	}
+	basicParams = make(map[string]string)
 
-	params, err = json.Marshal(p)
+	basicParams["apiKey"] = config.ApiKey
+	basicParams["version"] = constant.Version
+	basicParams["timeStamp"] = TimeStampUTC()
+
+	params, err = json.Marshal(basicParams)
 	secretKey = config.SecretKey
 
 	if err != nil {
