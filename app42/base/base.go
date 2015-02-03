@@ -53,3 +53,8 @@ func TimeStampUTC() string {
 	final := strings.Join(s, "T")
 	return final + "Z"
 }
+
+func AskAppName() (appName string) {
+	appName = term.Ask(term.Yellow("Enter App Name:"))
+	return
+}

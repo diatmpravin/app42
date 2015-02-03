@@ -24,6 +24,15 @@ func main() {
 			},
 		},
 		{
+			Name:      "setupInfra",
+			ShortName: "si",
+			Usage:     "Setup your deployment and runtime environment i.e. Instance(Memory, CPU) and Technology Stack",
+			Action: func(c *cli.Context) {
+				cmd := commands.NewSetupInfra()
+				cmd.Run(c)
+			},
+		},
+		{
 			Name:      "addKeys",
 			ShortName: "ak",
 			Usage:     "Add API key and Secret key",

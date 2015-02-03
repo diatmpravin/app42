@@ -10,33 +10,23 @@ import (
 	"github.com/diatmpravin/app42_client/app42/util"
 )
 
-type Apps struct {
-	Name string
+type SetupInfra struct {
 }
 
-type Param struct {
-	ApiKey    string `json:"apiKey"`
-	Version   string `json:"version"`
-	TimeStamp string `json:"timeStamp"`
-}
-
-func NewApps() (a Apps) {
+func NewSetupInfra() (s SetupInfra) {
 	return
 }
 
-func (a Apps) Run(c *cli.Context) {
-
-	path := constant.Host + constant.Version + "/app"
-
-	apps := a.findAllApps(path)
-	fmt.Println("Response====>", apps)
-
+func (s SetupInfra) Run(c *cli.Context) {
+	appName := base.AskAppName()
+	s.checkAppAvailability(appName)
+	fmt.Println(appName)
 }
 
-func (a Apps) findAllApps(url string) (response interface{}) {
-
+func (s SetupInfra) checkAppAvailability(appName string) {
+	path := constant.Host + constant.Version + "/app/availability"
 	secretKey, params := base.Params()
-	request := api.NewGetRequest("GET", url)
+	request := api.NewGetRequest("GET", path)
 
 	signature := util.Sign(secretKey, string(params))
 
@@ -56,5 +46,5 @@ func (a Apps) findAllApps(url string) (response interface{}) {
 		return
 	}
 
-	return
+	fmt.Println("--------------->", response)
 }

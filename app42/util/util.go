@@ -5,7 +5,9 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/url"
+	"reflect"
 )
 
 type Param struct {
@@ -26,6 +28,8 @@ func sortConvert(params string) string {
 	var pro Param
 
 	_ = json.Unmarshal([]byte(params), &pro)
+
+	fmt.Println("pro==============>", reflect.TypeOf(pro))
 
 	sortedParams = sortedParams + "apiKey" + pro.ApiKey + "timeStamp" + pro.TimeStamp + "version" + pro.Version
 

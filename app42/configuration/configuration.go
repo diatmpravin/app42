@@ -63,7 +63,7 @@ func configFile() (file string, err error) {
 		return
 	}
 
-	file = configDir + "/app42paas.yml"
+	file = configDir + "/app42.yml"
 
 	return
 }
