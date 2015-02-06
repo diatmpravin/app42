@@ -2,11 +2,23 @@ package app42
 
 //http://play.golang.org/p/FVi-b1mywd
 
+type Subscription struct {
+	Response struct {
+		Success        bool
+		DeploymentType []string
+	}
+}
+
+type AppSubscription struct {
+	App42 Subscription
+}
+
 type ResponseData struct {
 	Response struct {
 		UserId       string `json:"userId"`
 		Success      bool   `json:"success"`
 		ResourceName string `json:"resourceName"`
+		Description  string `json:"description"`
 	}
 }
 
