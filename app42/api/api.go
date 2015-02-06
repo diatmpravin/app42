@@ -24,7 +24,7 @@ func NewGetRequest(method, path string) (request *http.Request) {
 	return
 }
 
-func PerformRequestForBody(request *http.Request, response interface{}) (interface{}, error) {
+func PerformRequestForBody(request *http.Request, response interface{}) (err error) {
 	cli := &http.Client{}
 
 	rawResponse, err := cli.Do(request)
@@ -45,6 +45,5 @@ func PerformRequestForBody(request *http.Request, response interface{}) (interfa
 	if err != nil {
 		err = errors.New(fmt.Sprintf("Invalid JSON response from server: %s", err.Error()))
 	}
-
-	return response, err
+	return
 }

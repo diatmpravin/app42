@@ -1,0 +1,39 @@
+package app42
+
+//http://play.golang.org/p/FVi-b1mywd
+
+type ResponseData struct {
+	Response struct {
+		UserId       string `json:"userId"`
+		Success      bool   `json:"success"`
+		ResourceName string `json:"resourceName"`
+	}
+}
+
+type AppAvailability struct {
+	App42 ResponseData
+}
+
+type App struct {
+	Response struct {
+		Success bool
+		Apps    []struct {
+			AppUrl         string
+			AppStatus      string
+			IaasProvider   string
+			Email          string
+			VmType         string
+			AppState       string
+			Name           string
+			IaasIdentifier string
+			Runtime        string
+			InstanceCount  int
+			Framework      string
+			Memory         string
+		}
+	}
+}
+
+type AllApps struct {
+	App42 App
+}

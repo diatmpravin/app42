@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/codegangsta/cli"
+	"github.com/diatmpravin/app42_client/app42"
 	"github.com/diatmpravin/app42_client/app42/api"
 	"github.com/diatmpravin/app42_client/app42/base"
 	"github.com/diatmpravin/app42_client/app42/constant"
@@ -28,12 +29,11 @@ func (a Apps) Run(c *cli.Context) {
 
 	path := constant.Host + constant.Version + "/app"
 
-	apps := a.findAllApps(path)
-	fmt.Println("Response====>", apps)
+	a.findAllApps(path)
 
 }
 
-func (a Apps) findAllApps(url string) (response interface{}) {
+func (a Apps) findAllApps(url string) {
 
 	secretKey, params := base.Params()
 	request := api.NewGetRequest("GET", url)
@@ -51,8 +51,14 @@ func (a Apps) findAllApps(url string) (response interface{}) {
 	request.Header.Set("timeStamp", pro.TimeStamp)
 	request.Header.Set("signature", signature)
 
-	response, err := api.PerformRequestForBody(request, nil)
+	response := new(app42.AllApps)
+
+	err := api.PerformRequestForBody(request, &response)
+
+	fmt.Printf("%+v\n", response)
+
 	if err != nil {
+		fmt.Println("Failed", err)
 		return
 	}
 
