@@ -2,6 +2,21 @@ package app42
 
 //http://play.golang.org/p/FVi-b1mywd
 
+type IaaS struct {
+	Response struct {
+		Success bool
+		Iaas    []struct {
+			Id   string
+			Name string
+			Zone string
+		}
+	}
+}
+
+type IaaSProviders struct {
+	App42 IaaS
+}
+
 type Subscription struct {
 	Response struct {
 		Success        bool
