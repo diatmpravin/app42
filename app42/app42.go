@@ -2,6 +2,21 @@ package app42
 
 //http://play.golang.org/p/FVi-b1mywd
 
+type Framework struct {
+	Response struct {
+		Success    bool
+		Frameworks []struct {
+			Id      string
+			Name    string
+			Version string
+		}
+	}
+}
+
+type Appframeworks struct {
+	App42 Framework
+}
+
 type Runtime struct {
 	Response struct {
 		Success  bool

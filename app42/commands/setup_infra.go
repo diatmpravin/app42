@@ -202,7 +202,6 @@ func (s SetupInfra) GetRuntime(iaasId, vmType string) (runtimeId string) {
 		request.Header.Set("signature", signature)
 	} else {
 		path := constant.Host + constant.Version + "/info/runtimes/dedicated" + "?iaas=" + iaasId + "&vmType=" + vmType
-		fmt.Println(path)
 		secretKey, basicParams := base.Params()
 		params = make(map[string]string)
 		_ = json.Unmarshal([]byte(basicParams), &params)
@@ -235,6 +234,7 @@ func (s SetupInfra) GetRuntime(iaasId, vmType string) (runtimeId string) {
 		runtimes = append(runtimes, response.App42.Response.Runtimes[i].Name+" "+response.App42.Response.Runtimes[i].Version)
 	}
 
+	// FIXME NEED TO FIX FOR DEDICATED APPS
 	runtime := s.chooseRuntime(runtimes)
 
 	for i := range runtimeMap {
@@ -246,9 +246,70 @@ func (s SetupInfra) GetRuntime(iaasId, vmType string) (runtimeId string) {
 	return
 }
 
+func (s SetupInfra) chooseFramework(frameworks []string) (framework string) {
+	for i, _ := range frameworks {
+		term.Say("%s: %s", term.Green(strconv.Itoa(i+1)), frameworks[i])
+	}
+
+	index, err := strconv.Atoi(term.Ask("Select IaaS Provider>"))
+
+	if err != nil || index > len(frameworks) {
+		term.Failed("Invalid number", err)
+		return s.chooseIaaS(frameworks)
+	}
+
+	return frameworks[index-1]
+}
+
+func (s SetupInfra) GetFramework(iaasId, vmType, runtime string) (frameworkId string) {
+	path := constant.Host + constant.Version + "/info/frameworks" + "?iaas=" + iaasId + "&vmType=" + vmType + "&runtime=" + runtime
+	secretKey, basicParams := base.Params()
+	params = make(map[string]string)
+	_ = json.Unmarshal([]byte(basicParams), &params)
+	params["vmType"] = vmType
+	params["iaas"] = iaasId
+	params["runtime"] = runtime
+	request := api.NewGetRequest("GET", path)
+	queryParams, _ := json.Marshal(params)
+	signature := util.Sign(secretKey, string(queryParams))
+
+	request.Header.Set("Accept", "application/json")
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("params", string(queryParams))
+	request.Header.Set("apiKey", params["apiKey"])
+	request.Header.Set("version", constant.Version)
+	request.Header.Set("timeStamp", params["timeStamp"])
+	request.Header.Set("signature", signature)
+
+	response := new(app42.Appframeworks)
+	err := api.PerformRequestForBody(request, &response)
+	if err != nil {
+		fmt.Println("Failed", err)
+	}
+
+	frameworks := []string{}
+	frameworkMap := make(map[string]string)
+
+	for i := 0; i < len(response.App42.Response.Frameworks); i++ {
+		frameworkMap[response.App42.Response.Frameworks[i].Id] = response.App42.Response.Frameworks[i].Name + " " + response.App42.Response.Frameworks[i].Version
+		frameworks = append(frameworks, response.App42.Response.Frameworks[i].Name+" "+response.App42.Response.Frameworks[i].Version)
+	}
+
+	framework := s.chooseFramework(frameworks)
+
+	for i := range frameworkMap {
+		if frameworkMap[i] == framework {
+			frameworkId = i
+		}
+	}
+
+	return
+}
+
 func (s SetupInfra) CollectVMDetails(appName, vmType, iaasId string) {
 	runtime := s.GetRuntime(iaasId, vmType)
-	fmt.Println(runtime)
+	framework := s.GetFramework(iaasId, vmType, runtime)
+	fmt.Println(framework)
 }
 
 func (s SetupInfra) Run(c *cli.Context) {
