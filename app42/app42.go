@@ -2,6 +2,36 @@ package app42
 
 //http://play.golang.org/p/FVi-b1mywd
 
+type Os struct {
+	Response struct {
+		Success  bool
+		OsDetail []struct {
+			Id      string
+			Name    string
+			Version string
+		}
+	}
+}
+
+type AppOS struct {
+	App42 Os
+}
+
+type Webservers struct {
+	Response struct {
+		Success   bool
+		Webserver []struct {
+			Id      string
+			Name    string
+			Version string
+		}
+	}
+}
+
+type AppWebservers struct {
+	App42 Webservers
+}
+
 type Framework struct {
 	Response struct {
 		Success    bool
