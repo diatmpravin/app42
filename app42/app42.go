@@ -2,6 +2,21 @@ package app42
 
 //http://play.golang.org/p/FVi-b1mywd
 
+type Runtime struct {
+	Response struct {
+		Success  bool
+		Runtimes []struct {
+			Id      string
+			Name    string
+			Version string
+		}
+	}
+}
+
+type AppRuntimes struct {
+	App42 Runtime
+}
+
 type IaaS struct {
 	Response struct {
 		Success bool

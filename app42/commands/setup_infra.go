@@ -10,6 +10,7 @@ import (
 	"github.com/diatmpravin/app42_client/app42/constant"
 	term "github.com/diatmpravin/app42_client/app42/terminal"
 	"github.com/diatmpravin/app42_client/app42/util"
+	"net/http"
 	"strconv"
 )
 
@@ -166,9 +167,93 @@ func (s SetupInfra) GetIaaSProviders(vmType string) (iaasId string) {
 	return
 }
 
+func (s SetupInfra) chooseRuntime(runtimes []string) (runtime string) {
+	for i, _ := range runtimes {
+		term.Say("%s: %s", term.Green(strconv.Itoa(i+1)), runtimes[i])
+	}
+
+	index, err := strconv.Atoi(term.Ask("Select IaaS Provider>"))
+
+	if err != nil || index > len(runtimes) {
+		term.Failed("Invalid number", err)
+		return s.chooseIaaS(runtimes)
+	}
+
+	return runtimes[index-1]
+}
+
+func (s SetupInfra) GetRuntime(iaasId, vmType string) (runtimeId string) {
+	var request *http.Request
+	if vmType == "Shared" {
+		path := constant.Host + constant.Version + "/info/runtimes"
+		secretKey, basicParams := base.Params()
+		params = make(map[string]string)
+		_ = json.Unmarshal([]byte(basicParams), &params)
+		request = api.NewGetRequest("GET", path)
+		queryParams, _ := json.Marshal(params)
+		signature := util.Sign(secretKey, string(queryParams))
+
+		request.Header.Set("Accept", "application/json")
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("params", string(queryParams))
+		request.Header.Set("apiKey", params["apiKey"])
+		request.Header.Set("version", constant.Version)
+		request.Header.Set("timeStamp", params["timeStamp"])
+		request.Header.Set("signature", signature)
+	} else {
+		path := constant.Host + constant.Version + "/info/runtimes/dedicated" + "?iaas=" + iaasId + "&vmType=" + vmType
+		fmt.Println(path)
+		secretKey, basicParams := base.Params()
+		params = make(map[string]string)
+		_ = json.Unmarshal([]byte(basicParams), &params)
+		params["vmType"] = vmType
+		params["iaas"] = iaasId
+		request = api.NewGetRequest("GET", path)
+		queryParams, _ := json.Marshal(params)
+		signature := util.Sign(secretKey, string(queryParams))
+
+		request.Header.Set("Accept", "application/json")
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("params", string(queryParams))
+		request.Header.Set("apiKey", params["apiKey"])
+		request.Header.Set("version", constant.Version)
+		request.Header.Set("timeStamp", params["timeStamp"])
+		request.Header.Set("signature", signature)
+	}
+
+	response := new(app42.AppRuntimes)
+	err := api.PerformRequestForBody(request, &response)
+	if err != nil {
+		fmt.Println("Failed", err)
+	}
+
+	runtimes := []string{}
+	runtimeMap := make(map[string]string)
+
+	for i := 0; i < len(response.App42.Response.Runtimes); i++ {
+		runtimeMap[response.App42.Response.Runtimes[i].Id] = response.App42.Response.Runtimes[i].Name + " " + response.App42.Response.Runtimes[i].Version
+		runtimes = append(runtimes, response.App42.Response.Runtimes[i].Name+" "+response.App42.Response.Runtimes[i].Version)
+	}
+
+	runtime := s.chooseRuntime(runtimes)
+
+	for i := range runtimeMap {
+		if runtimeMap[i] == runtime {
+			runtimeId = i
+		}
+	}
+
+	return
+}
+
+func (s SetupInfra) CollectVMDetails(appName, vmType, iaasId string) {
+	runtime := s.GetRuntime(iaasId, vmType)
+	fmt.Println(runtime)
+}
+
 func (s SetupInfra) Run(c *cli.Context) {
 	appName := s.GetAppAndCheckAvailability(1)
 	vmType := s.GetVMType(appName)
 	iaasId := s.GetIaaSProviders(vmType)
-	fmt.Println(iaasId)
+	s.CollectVMDetails(appName, vmType, iaasId)
 }
